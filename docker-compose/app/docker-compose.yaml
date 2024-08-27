@@ -1,0 +1,43 @@
+services:
+  frontend:
+    build: ./frontend
+    restart: on-failure
+    ports:
+      - "8080:80"
+
+  backend:
+    build: ./backend
+    restart: on-failure
+    networks:
+      - database
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=mongodb://root:example@db:27017/
+      - PORT=8000
+    depends_on:
+      - db
+
+  db:
+    image: mongo
+    restart: on-failure
+    networks:
+      - database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo1_data:/data/db
+      - mongo1_config:/data/configdb
+
+networks:
+  database:
+    driver: bridge
+
+
+volumes:
+  mongo1_data:
+  mongo1_config:
+
